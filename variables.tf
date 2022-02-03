@@ -84,7 +84,7 @@ variable "rds_username" {
 variable "rds_password" {
     type = string
     description = "The default password"
-    default = "bar"
+    default = "123456789"
 }
 
 variable "rds_cluster_identifier" {
@@ -96,11 +96,6 @@ variable "rds_cluster_identifier" {
 variable "rds_backup_retention" {
     type = number
     description = "How long it should hold a backup"
-    default = 5
+    default = 0
 }
 
-variable "rds_backup_window" {
-    type = string
-    description = "The time to take backups"
-    default = "07:00-09:00"
-}

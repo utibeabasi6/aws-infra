@@ -114,14 +114,25 @@ resource "aws_instance" "lamp-server" {
   }
 }
 
+resource "aws_elasticache_parameter_group" "default" {
+  name   = "cache-params"
+  family = "memcached1.6"
+}
+
+resource "aws_elasticache_subnet_group" "redis" {
+  name       = "private-subnets"
+  description = "subnet where elasticache will live"
+  subnet_ids = [aws_subnet.private[0].id]
+}
+
 resource "aws_elasticache_cluster" "elasticache" {
   cluster_id           = var.elasticache_cluster_id
   engine               = "memcached"
   node_type            = var.elasticache_cluster_node_type
   num_cache_nodes      = var.elasticache_num_cache_nodes
-  parameter_group_name = "default.memcached1.4"
+  parameter_group_name = aws_elasticache_parameter_group.default.name
   port                 = 11211
-  security_group_ids = [aws_subnet.private[0].id]
+  subnet_group_name = aws_elasticache_subnet_group.redis.name
 }
 
 resource "aws_rds_cluster" "rds" {
@@ -132,6 +143,7 @@ resource "aws_rds_cluster" "rds" {
   database_name           = var.rds_db_name
   master_username         = var.rds_username
   master_password         = var.rds_password
-  backup_retention_period = var.rds_backup_retention
-  preferred_backup_window = var.rds_backup_window
+#   backup_retention_period = var.rds_backup_retention
+  skip_final_snapshot = true
+  apply_immediately = true
 }
